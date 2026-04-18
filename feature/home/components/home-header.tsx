@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { router } from 'expo-router';
 import { useThemeColors } from '@/hooks/use-theme-color';
 
 export function HomeHeader() {
@@ -16,16 +17,27 @@ export function HomeHeader() {
         </View>
 
         {/* Right */}
-        <TouchableOpacity
-          style={[s.notifBtn, { backgroundColor: c.card, borderColor: c.border }]}
-          activeOpacity={0.75}
-        >
-          <Ionicons name="notifications-outline" size={20} color={c.text} />
-          {/* Badge */}
-          <View style={[s.badge, { backgroundColor: c.accent }]}>
-            <Text style={s.badgeText}>3</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={s.rightRow}>
+          {/* Login button */}
+          <TouchableOpacity
+            onPress={() => router.push('/(auth)/login')}
+            style={[s.iconBtn, { backgroundColor: c.card, borderColor: c.border }]}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="log-in-outline" size={20} color={c.accent} />
+          </TouchableOpacity>
+
+          {/* Notification button */}
+          <TouchableOpacity
+            style={[s.iconBtn, { backgroundColor: c.card, borderColor: c.border }]}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="notifications-outline" size={20} color={c.text} />
+            <View style={[s.badge, { backgroundColor: c.accent }]}>
+              <Text style={s.badgeText}>3</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -50,7 +62,12 @@ const s = StyleSheet.create({
     letterSpacing: -0.5,
     marginTop: 2,
   },
-  notifBtn: {
+  rightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconBtn: {
     width: 42,
     height: 42,
     borderRadius: 12,
