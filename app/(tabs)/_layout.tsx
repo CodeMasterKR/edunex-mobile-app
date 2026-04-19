@@ -1,39 +1,30 @@
 import { Tabs } from 'expo-router';
-import { Platform, View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '@/hooks/use-theme-color';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
-function TabIcon({
-  name,
-  focused,
-}: {
-  name: IoniconsName;
-  focused: boolean;
-}) {
+function TabIcon({ name, focused }: { name: IoniconsName; focused: boolean }) {
   const c = useThemeColors();
-
   return (
-    <View
-      style={[
-        s.iconWrap,
-        focused && {
-          backgroundColor: c.accent + '20',
-        },
-      ]}
-    >
-      <Ionicons
-        name={name}
-        size={22}
-        color={focused ? c.accent : c.muted}
-      />
+    <View style={[styles.iconWrap, { backgroundColor: focused ? c.accent : 'transparent' }]}>
+      <Ionicons name={name} size={22} color={focused ? '#FFFFFF' : c.muted} />
     </View>
   );
 }
 
 export default function TabLayout() {
   const c = useThemeColors();
+  const insets = useSafeAreaInsets();
+
+  const tabs = [
+    { name: 'index',    title: 'Bosh sahifa', icon: 'home' as IoniconsName,     iconOutline: 'home-outline' as IoniconsName },
+    { name: 'groups',   title: 'Guruhlar',    icon: 'people' as IoniconsName,   iconOutline: 'people-outline' as IoniconsName },
+    { name: 'payments', title: "To'lovlar",   icon: 'card' as IoniconsName,     iconOutline: 'card-outline' as IoniconsName },
+    { name: 'settings', title: 'Sozlama',     icon: 'settings' as IoniconsName, iconOutline: 'settings-outline' as IoniconsName },
+  ];
 
   return (
     <Tabs
@@ -43,66 +34,58 @@ export default function TabLayout() {
         tabBarActiveTintColor: c.accent,
         tabBarInactiveTintColor: c.muted,
         tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
-          marginTop: 2,
+          fontSize: 11,
+          fontWeight: '500',
+          marginTop: 4,
         },
         tabBarStyle: {
           backgroundColor: c.card,
-          borderTopWidth: 1,
+          borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: c.border,
-          height: Platform.OS === 'ios' ? 85 : 68,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 10,
+          height: 56 + insets.bottom,
+          paddingBottom: insets.bottom || 8,
           paddingTop: 8,
+          ...Platform.select({
+            ios: {
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: -2 },
+              shadowOpacity: 0.06,
+              shadowRadius: 8,
+            },
+            android: { elevation: 8 },
+          }),
+        },
+        tabBarItemStyle: {
+          alignItems: 'center',
+          justifyContent: 'center',
         },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Bosh sahifa',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon name={focused ? 'home' : 'home-outline'} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="groups"
-        options={{
-          title: 'Guruhlar',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon name={focused ? 'people' : 'people-outline'} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="payments"
-        options={{
-          title: "To'lovlar",
-          tabBarIcon: ({ focused }) => (
-            <TabIcon name={focused ? 'card' : 'card-outline'} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Sozlama',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon name={focused ? 'settings' : 'settings-outline'} focused={focused} />
-          ),
-        }}
-      />
+      {tabs.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.title,
+            tabBarIcon: ({ focused }) => (
+              <TabIcon
+                name={focused ? tab.icon : tab.iconOutline}
+                focused={focused}
+              />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
 
-const s = StyleSheet.create({
+const styles = StyleSheet.create({
   iconWrap: {
-    width: 44,
-    height: 32,
+    width: 40,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 10,
   },
 });
